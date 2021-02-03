@@ -1,8 +1,9 @@
 package restful
 
 import (
-	"github.com/meidomx/user/model"
 	"net/http"
+
+	"github.com/meidomx/user/model"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,10 +34,10 @@ func initApi(g *gin.Engine) {
 	})
 
 	// create user
-	grp.POST("/user")
+	grp.POST("/user", CreateUser)
 	// get user info
-	grp.GET("/user/:user_id")
+	grp.GET("/user/:user_id", GetUser)
 
 	// auth using password method
-	grp.POST("/auth/password")
+	grp.POST("/auth/password", AuthPassword)
 }

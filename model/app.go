@@ -2,8 +2,9 @@ package model
 
 import (
 	"context"
-	"github.com/moetang/webapp-scaffold/frmpg"
 	"time"
+
+	"github.com/moetang/webapp-scaffold/frmpg"
 )
 
 type AppStatus int16
@@ -12,7 +13,7 @@ type AppTokenStatus int16
 
 const (
 	AppStatusNormal AppStatus = 0
-	AppStatusDelete           = 1
+	AppStatusDelete AppStatus = 1
 )
 
 const (
@@ -40,7 +41,7 @@ type AppToken struct {
 	SecurityValue      *string        `mx.orm:"security_value"`
 	TokenType          AppTokenType   `mx.orm:"token_type"`
 	TokenStatus        AppTokenStatus `mx.orm:"token_status"`
-	ExpirydateInMillis int64          `mx.orm:"expirydate_millis"`
+	ExpirydateInMillis *int64         `mx.orm:"expirydate_millis"`
 	TimeCreated        int64          `mx.orm:"time_created"`
 	TimeUpdated        int64          `mx.orm:"time_updated"`
 }
@@ -82,9 +83,11 @@ func ValidateAppNameAndToken(appName, token string) (bool, error) {
 	}
 
 	// validate time
-	now := time.Now()
-	if t.ExpirydateInMillis <= now.Unix()*1000+now.UnixNano()/1000000 {
-		return false, nil
+	if t.ExpirydateInMillis != nil {
+		now := time.Now()
+		if *t.ExpirydateInMillis <= now.Unix()*1000+now.UnixNano()/1000000 {
+			return false, nil
+		}
 	}
 
 	a, err := LoadAppAppByAppId(t.AppId)

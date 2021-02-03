@@ -26,3 +26,30 @@ INSERT INTO app_app(APP_NAME, APP_STATUS, TIME_CREATED, TIME_UPDATED) VALUES ('u
 
 INSERT INTO app_token(app_id, token, token_type, token_status, expirydate_millis, time_created, time_updated)
     VALUES (1, 'userservtoken', 1, 0, 253373578095000, 1, 1);
+
+CREATE TABLE public.user_user (
+                                  user_id bigserial NOT NULL,
+                                  user_type smallint NOT NULL,
+                                  user_status smallint NOT NULL,
+                                  user_tag1 bigint NOT NULL DEFAULT 0,
+                                  user_tag2 bigint NOT NULL DEFAULT 0,
+                                  user_name varchar(400) NULL,
+                                  display_name varchar(400) NULL,
+                                  time_created bigint NOT NULL,
+                                  time_updated bigint NOT NULL,
+                                  CONSTRAINT user_user_pk PRIMARY KEY (user_id)
+);
+
+CREATE TABLE public.user_credential (
+                                        credential_id bigserial NOT NULL,
+                                        user_id bigint NOT NULL,
+                                        credential_type smallint NOT NULL,
+                                        credential_key varchar(400) NOT NULL,
+                                        credential_value varchar(400) NULL,
+                                        credential_status smallint NOT NULL,
+                                        time_created bigint NOT NULL,
+                                        time_updated bigint NOT NULL,
+                                        CONSTRAINT user_credential_pk PRIMARY KEY (credential_id)
+);
+CREATE UNIQUE INDEX user_credential_credential_key_idx ON public.user_credential (credential_key,credential_type);
+
