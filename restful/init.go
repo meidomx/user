@@ -8,4 +8,5 @@ func InitRestful(w *scaffold.WebappScaffold) {
 	webscaff = w
 
 	initApi(webscaff.GetGin())
+	initSso(webscaff.GetGin())
 }

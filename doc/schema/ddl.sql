@@ -26,6 +26,8 @@ INSERT INTO app_app(APP_NAME, APP_STATUS, TIME_CREATED, TIME_UPDATED) VALUES ('u
 
 INSERT INTO app_token(app_id, token, token_type, token_status, expirydate_millis, time_created, time_updated)
     VALUES (1, 'userservtoken', 1, 0, 253373578095000, 1, 1);
+INSERT INTO app_token(app_id, token, security_value, token_type, token_status, expirydate_millis, time_created, time_updated)
+    VALUES (1, 'userservtokensso', 'userservtokenssovalue', 1, 0, 253373578095000, 1, 1);
 
 CREATE TABLE public.user_user (
                                   user_id bigserial NOT NULL,
@@ -53,3 +55,17 @@ CREATE TABLE public.user_credential (
 );
 CREATE UNIQUE INDEX user_credential_credential_key_idx ON public.user_credential (credential_key,credential_type);
 
+CREATE TABLE public.sso_app (
+                                sso_app_id bigserial NOT NULL,
+                                app_id bigint NOT NULL,
+                                sso_app_status smallint NOT NULL,
+                                redirect_uri varchar(400) NOT NULL,
+                                callback_uri varchar(400) NOT NULL,
+                                time_created bigint NOT NULL,
+                                time_updated bigint NOT NULL,
+                                CONSTRAINT sso_app_pk PRIMARY KEY (sso_app_id)
+);
+CREATE INDEX sso_app_app_id_idx ON public.sso_app (app_id);
+
+INSERT INTO sso_app(app_id, sso_app_status, redirect_uri, callback_uri, time_created, time_updated)
+VALUES (1, 0, '*', 'http://example.com', 1, 1);

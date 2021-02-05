@@ -3,7 +3,7 @@ debug = true
 
 [gin]
 release_mode = false
-html_glob_paths = []
+html_glob_paths = ["static/*"]
 listen = ":6001"
 
 [postgres]

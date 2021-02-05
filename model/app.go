@@ -58,6 +58,18 @@ func LoadAppAppByAppName(appName string) (*AppApp, error) {
 	}
 }
 
+func LoadAppTokenByToken(token string) (*AppToken, error) {
+	var t = new(AppToken)
+	err := frmpg.QuerySingle(db.GetPostgresPool(), t, context.Background(),
+		"select * from app_token where token = $1 and token_status = $2",
+		token, AppTokenStatusNormal)
+	if err != nil {
+		return nil, err
+	} else {
+		return t, nil
+	}
+}
+
 func LoadAppAppByAppId(appId int64) (*AppApp, error) {
 	var app = new(AppApp)
 	err := frmpg.QuerySingle(db.GetPostgresPool(), app, context.Background(),

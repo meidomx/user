@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - User</title>
+    {{template "lib_header" .}}
+</head>
+<body>
+
+<div class="container">
+    <h1>User - Login</h1>
+    <form action="/sso/v1/login" method="post" enctype="application/x-www-form-urlencoded">
+        <input name="authid" type="hidden" value="{{.ItemId}}" class="form-control" id="authidInput" aria-describedby="authidInputHelp">
+        <div class="mb-3">
+            <label for="usernameInput" class="form-label">User Name</label>
+            <input name="username" type="text" class="form-control" id="usernameInput" aria-describedby="usernameInputHelp">
+            <div id="usernameInputHelp" class="form-text">Please input schedule title.</div>
+        </div>
+        <div class="mb-3">
+            <label for="passwordInput" class="form-label">Password</label>
+            <input name="password" type="password" class="form-control" id="passwordInput" aria-describedby="passwordInputHelp">
+            <div id="passwordInputHelp" class="form-text">Please input schedule title.</div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+</body>
+</html>

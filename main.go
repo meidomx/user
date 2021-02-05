@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/meidomx/user/model"
 	"github.com/meidomx/user/restful"
+	"github.com/meidomx/user/shared"
 
 	scaffold "github.com/moetang/webapp-scaffold"
 
@@ -21,6 +22,7 @@ func main() {
 	webscaf.GetGin().Use(gin.Logger())
 	webscaf.GetGin().Use(gin.Recovery())
 
+	shared.InitRedis()
 	model.Init(webscaf)
 	restful.InitRestful(webscaf)
 
