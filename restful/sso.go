@@ -4,14 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v8"
-	"github.com/gofrs/uuid"
-	"github.com/meidomx/user/model"
-	"github.com/meidomx/user/shared"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/meidomx/user/model"
+	"github.com/meidomx/user/shared"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
+	"github.com/gofrs/uuid"
 )
 
 func initSso(g *gin.Engine) {

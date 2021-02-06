@@ -10,10 +10,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type UserConfig struct {
+	User struct {
+		RedisConfig struct {
+			Host string `toml:"host"`
+		} `toml:"redis"`
+	} `toml:"user"`
+}
+
 func main() {
 
 	webscaf, err := scaffold.NewFromConfigFile("user.toml")
 	if err != nil {
+		panic(err)
+	}
+	uc := new(UserConfig)
+	if err := scaffold.ReadCustomConfig("user.toml", uc); err != nil {
 		panic(err)
 	}
 
@@ -22,7 +34,7 @@ func main() {
 	webscaf.GetGin().Use(gin.Logger())
 	webscaf.GetGin().Use(gin.Recovery())
 
-	shared.InitRedis()
+	shared.InitRedis(uc.User.RedisConfig.Host, "")
 	model.Init(webscaf)
 	restful.InitRestful(webscaf)
 
