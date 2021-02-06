@@ -29,8 +29,6 @@ func main() {
 		panic(err)
 	}
 
-	var _ = webscaf
-
 	webscaf.GetGin().Use(gin.Logger())
 	webscaf.GetGin().Use(gin.Recovery())
 

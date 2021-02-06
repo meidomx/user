@@ -257,10 +257,12 @@ func Login(ctx *gin.Context) {
 func Token(ctx *gin.Context) {
 	var to = new(TokenRequest)
 	if err := ctx.ShouldBindQuery(to); err != nil {
-		ctx.JSON(http.StatusBadRequest, TokenFailReply{
-			Error: "param invalid",
-		})
-		return
+		if err = ctx.ShouldBind(to); err != nil {
+			ctx.JSON(http.StatusBadRequest, TokenFailReply{
+				Error: "param invalid",
+			})
+			return
+		}
 	}
 	if to.GrantType != "authorization_code" {
 		log.Println("[ERROR] grant type error.")
