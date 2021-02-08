@@ -69,3 +69,19 @@ CREATE INDEX sso_app_app_id_idx ON public.sso_app (app_id);
 
 INSERT INTO sso_app(app_id, sso_app_status, redirect_uri, callback_uri, time_created, time_updated)
 VALUES (1, 0, '*', 'http://example.com', 1, 1);
+
+
+CREATE TABLE public.user_access_token (
+                                          user_access_token_id bigserial NOT NULL,
+                                          app_token_id bigint NOT NULL,
+                                          user_id bigint NOT NULL,
+                                          access_token varchar(4000) NOT NULL,
+                                          expirydate_sec bigint NOT NULL,
+                                          status smallint NOT NULL,
+                                          time_created bigint NOT NULL,
+                                          time_updated bigint NOT NULL,
+                                          CONSTRAINT user_access_token_pk PRIMARY KEY (user_access_token_id)
+);
+CREATE INDEX user_access_token_app_token_id_idx ON public.user_access_token (app_token_id);
+CREATE INDEX user_access_token_user_id_idx ON public.user_access_token (user_id);
+CREATE UNIQUE INDEX user_access_token_access_token_idx ON public.user_access_token (access_token);

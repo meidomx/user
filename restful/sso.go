@@ -3,9 +3,11 @@ package restful
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/meidomx/user/model"
@@ -23,6 +25,7 @@ func initSso(g *gin.Engine) {
 	grp.GET("/auth", Auth)
 	grp.POST("/login", Login)
 	grp.POST("/token", Token)
+	grp.GET("/user_info", SsoUserInfo)
 }
 
 type CacheItem struct {
@@ -35,6 +38,16 @@ type CacheItem struct {
 	CallbackUrl  string   `json:"callback_url"`
 	SsoAppId     int64    `json:"sso_app_id"`
 	AppTokenId   int64    `json:"app_token_id"`
+
+	UserId          int64  `json:"user_id"`
+	UserName        string `json:"user_name"`
+	UserDisplayName string `json:"user_display_name"`
+}
+
+type UserInfo struct {
+	UserId          int64  `json:"user_id"`
+	UserName        string `json:"user_name"`
+	UserDisplayName string `json:"user_display_name"`
 }
 
 type AuthRequest struct {
@@ -223,6 +236,9 @@ func Login(ctx *gin.Context) {
 		})
 		return
 	}
+	ci.UserId = useruser.UserId
+	ci.UserName = useruser.UserName
+	ci.UserDisplayName = useruser.DisplayName
 
 	uu, err := uuid.NewV4()
 	if err != nil {
@@ -339,8 +355,76 @@ func Token(ctx *gin.Context) {
 		return
 	}
 
+	now := time.Now()
+	oneh := now.Add(1 * time.Hour)
+
+	ui := new(UserInfo)
+	ui.UserId = ci.UserId
+	ui.UserName = ci.UserName
+	ui.UserDisplayName = ci.UserDisplayName
+
+	uis, err := json.Marshal(ui)
+	if err != nil {
+		log.Println("[ERROR] marshal UserInfo failed.", err)
+		ctx.JSON(http.StatusInternalServerError, TokenFailReply{
+			Error: "internal error",
+		})
+		return
+	}
+	cmd := shared.RedisClient.Set(context.Background(), makeUserInfoKey(uu.String()), uis, 1*time.Hour) // 1h ttl
+	if _, err := cmd.Result(); err != nil {
+		log.Println("[ERROR] set UserInfo failed.", err)
+		ctx.JSON(http.StatusInternalServerError, TokenFailReply{
+			Error: "internal error",
+		})
+		return
+	}
+
 	tr := new(TokenReply)
 	tr.AccessToken = uu.String()
-	tr.ExpiresIn = 253370736000 // 9999-01-01 00:00:00
+	tr.ExpiresIn = int(oneh.Unix())
 	ctx.JSON(http.StatusOK, tr)
+}
+
+func makeUserInfoKey(s string) string {
+	return "ssouserinfo_" + s
+}
+
+func SsoUserInfo(ctx *gin.Context) {
+	a := ctx.GetHeader("Authorization")
+	if len(a) == 0 {
+		ctx.JSON(http.StatusForbidden, TokenFailReply{
+			Error: "internal error",
+		})
+		return
+	}
+
+	ss := strings.Split(a, " ")
+	if len(ss) != 2 {
+		ctx.JSON(http.StatusForbidden, TokenFailReply{
+			Error: "internal error",
+		})
+		return
+	}
+
+	cmd := shared.RedisClient.Get(context.Background(), makeUserInfoKey(ss[1]))
+	if d, err := cmd.Result(); err != nil {
+		ctx.JSON(http.StatusForbidden, TokenFailReply{
+			Error: "internal error",
+		})
+		return
+	} else {
+		var ui = new(UserInfo)
+		err := json.Unmarshal([]byte(d), ui)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, TokenFailReply{
+				Error: "internal error",
+			})
+			return
+		}
+		ctx.JSON(http.StatusOK, ui)
+		return
+	}
+
+	panic(errors.New("cannot reach here"))
 }
